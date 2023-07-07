@@ -1,0 +1,19 @@
+Package: gloUrbApp
+Title: An app for the GloUrb project
+Version: 0.0.0.9000
+Authors@R: person('Lise', 'Vaudor', email = 'lise.vaudor@ens-lyon.fr', role = c('cre', 'aut'))
+Description: PKG_DESC.
+License: What license is it under?
+Imports: 
+    config,
+    golem,
+    leaflet,
+    shiny
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Suggests: 
+    spelling,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Language: en-US
