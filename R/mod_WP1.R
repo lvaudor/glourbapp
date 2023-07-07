@@ -20,8 +20,8 @@ mod_WP1_ui <- function(id){
                                        label="choose variable",
                                        selected="cluster",
                                        choices=c("cluster",
-                                                 c(sep_data(all_cities)$vars_cat,
-                                                   sep_data(all_cities)$vars_num))),
+                                                 c(glourbi::sep_data(all_cities)$vars_cat,
+                                                   glourbi::sep_data(all_cities)$vars_num))),
                            textOutput(ns("description_var"))
                            ),#wellPanel
                            wellPanel(p("When considering classes:"),
