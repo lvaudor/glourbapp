@@ -19,7 +19,9 @@ mod_WP1_ui <- function(id){
                            selectInput(ns("select_var"),
                                        label="choose variable",
                                        selected="cluster",
-                                       choices=c("cluster",varsdistrib)),
+                                       choices=c("cluster",
+                                                 c(sep_data(all_cities)$vars_cat,
+                                                   sep_data(all_cities)$vars_num))),
                            textOutput(ns("description_var"))
                            ),#wellPanel
                            wellPanel(p("When considering classes:"),
