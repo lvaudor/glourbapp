@@ -1,4 +1,4 @@
-Package: gloUrbApp
+Package: glourbapp
 Title: An app for the GloUrb project
 Version: 0.0.0.9000
 Authors@R: person('Lise', 'Vaudor', email = 'lise.vaudor@ens-lyon.fr', role = c('cre', 'aut'))

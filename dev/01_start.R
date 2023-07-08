@@ -19,7 +19,7 @@
 ## to change the name in the app_sys() function in app_config.R /!\
 ##
 golem::fill_desc(
-  pkg_name = "gloUrbApp", # The Name of the package containing the App
+  pkg_name = "glourbapp", # The Name of the package containing the App
   pkg_title = "An app for the GloUrb project", # The Title of the package containing the App
   pkg_description = "PKG_DESC.", # The Description of the package containing the App
   author_first_name = "Lise", # Your First Name

@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(gloUrbApp)
+library(glourbapp)
 
-test_check("gloUrbApp")
+test_check("glourbapp")
