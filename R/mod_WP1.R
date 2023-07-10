@@ -11,50 +11,43 @@ mod_WP1_ui <- function(id){
   ns <- NS(id)
   tagList(
     golem_add_external_resources(),
-    tabsetPanel(
-      tabPanel("viz",
-               fluidRow(
-                    column(width=3,
-                           wellPanel(
-                           selectInput(ns("select_var"),
-                                       label="choose variable",
-                                       selected="cluster",
-                                       choices=c("cluster",
-                                                 c(glourbi::sep_data(all_cities)$vars_cat,
-                                                   glourbi::sep_data(all_cities)$vars_num))),
-                           textOutput(ns("description_var"))
-                           ),#wellPanel
-                           wellPanel(p("When considering classes:"),
-                                     numericInput(ns("nclust"),
-                                         "Number of classes",
-                                          min=2,max=30, value=2),
-                                     checkboxInput(ns("distrib_by_class"),
-                                                 "display distribution by class")
-                                     ),#wellPanel
-                           ),#column
-                    column(width=7,
-                           plotOutput(ns("plot_distrib"))
-                           ),#column
-                    column(width=2,
-                           plotOutput(ns("plot_palette"))
+    fluidRow(column(width=3,
+                    wellPanel(
+                      selectInput(ns("select_var"),
+                                  label="choose variable",
+                                  selected="cluster",
+                                  choices=c("cluster",
+                                            c(glourbi::sep_data(all_cities)$vars_cat,
+                                              glourbi::sep_data(all_cities)$vars_num))),
+                      textOutput(ns("description_var")),
+                      numericInput(ns("nclust"),
+                                   "cluster: nb of classes",
+                                   min=2,max=30, value=2),
+                      checkboxInput(ns("distrib_by_class"),
+                                    "display univar distribution by cluster")
+                    ),#wellPanel
+                    plotOutput(ns("plot_palette"))
                     ),#column
-               ),
-               leaflet::leafletOutput(ns("global_map"))
-    ),#tabPanel
-    tabPanel("PCA",
-
-           fluidRow(
-             column(width=6,
-                    plotOutput(ns("varpcaplot"))),
-             column(width=6,
-                    plotOutput(ns("indpcaplot")))
-           )#fluidRow
-    ),#tabPanel
-    tabPanel("data",
-             dataTableOutput(ns("tableclust"))
-    )#tabPanel
-  )#tabsetPanel
-
+                    column(width=9,
+                           leaflet::leafletOutput(ns("global_map")),
+                           tabsetPanel(
+                             tabPanel("univar",
+                                      plotOutput(ns("plot_distrib"))
+                             ),#tabPanel
+                             tabPanel("multivar",
+                                      fluidRow(
+                                        column(width=6,
+                                               plotly::plotlyOutput(ns("varpcaplot"))),
+                                        column(width=6,
+                                               plotly::plotlyOutput(ns("indpcaplot")))
+                                      )#fluidRow
+                             ),#tabPanel
+                             tabPanel("data",
+                                      dataTableOutput(ns("tableclust"))
+                             )#tabPanel
+                           )#tabsetPanel
+                    )#column
+    )#fluidRow
   )#tagList
 }
 
@@ -78,15 +71,17 @@ mod_WP1_server <- function(id){
     })
     r_calc_pca=reactive({
       all_cities_clust=r_all_cities()
-      mypca=glourbi::run_pca(all_cities_clust,quali.sup="cluster")
+      mypca=glourbi::run_pca(all_cities_clust,quali.sup=input$select_var)
     })
-    output$varpcaplot=renderPlot({
-      mypca=r_calc_pca()
-      glourbi::plot_pca(mypca,type="var")
+    output$varpcaplot=plotly::renderPlotly({
+      glourbi::plot_pca(dataset=r_all_cities(),
+                        r_calc_pca(),
+                        type="var")
     })
-    output$indpcaplot=renderPlot({
-      mypca=r_calc_pca()
-      glourbi::plot_pca(mypca,type="ind")
+    output$indpcaplot=plotly::renderPlotly({
+      glourbi::plot_pca(dataset=r_all_cities(),
+                        r_calc_pca(),
+                        type="ind")
     })
     output$global_map=leaflet::renderLeaflet({
       glourbi::global_map(dataset=r_all_cities(),

@@ -8,6 +8,7 @@ Imports:
     config,
     golem,
     leaflet,
+    plotly,
     shiny
 Encoding: UTF-8
 LazyData: true
