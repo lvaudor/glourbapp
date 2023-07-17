@@ -31,6 +31,14 @@ mod_WP1_ui <- function(id){
                     column(width=9,
                            leaflet::leafletOutput(ns("global_map")),
                            tabsetPanel(
+                             tabPanel("city",
+
+                                      selectInput(ns("name_city"),
+                                                  "Choose a city",
+                                                   choices=all_cities$name,
+                                                   selected="Lyon--France"),
+                                      plotOutput(ns("plot_city"))
+                             ),#tabPanel
                              tabPanel("univar",
                                       plotOutput(ns("plot_distrib"))
                              ),#tabPanel
@@ -95,6 +103,10 @@ mod_WP1_server <- function(id){
       glourbi::plot_distrib(dataset=r_all_cities(),
                             varname=input$select_var,
                             byclass=input$distrib_by_class)
+    })
+    output$plot_city=renderPlot({
+      glourbi::describe_city(dataset=r_all_cities(),
+                             input$name_city)
     })
   })
 }
