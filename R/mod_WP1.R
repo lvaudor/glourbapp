@@ -35,10 +35,7 @@ mod_WP1_ui <- function(id){
                                       fluidRow(
                                         column(width=6,
                                                "Choose a city by clicking on the map",
-                                               uiOutput(ns("city_name")),
-                                               checkboxInput(ns("city_selected"),
-                                                             "select city",
-                                                             value=FALSE)
+                                               uiOutput(ns("city_name"))
                                                ),#column
                                         column(width=6,
                                                plotOutput(ns("plot_city")))#column
@@ -75,7 +72,6 @@ mod_WP1_ui <- function(id){
 mod_WP1_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-    #observe({updateCheckboxInput(session,"city_selected",value=r_get_city_selected())})
     r_all_cities=reactive({
       dataset=glourbi::run_hclust(all_cities, nclust=input$nclust)
       dataset
