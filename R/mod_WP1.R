@@ -32,12 +32,18 @@ mod_WP1_ui <- function(id){
                            leaflet::leafletOutput(ns("global_map")),
                            tabsetPanel(
                              tabPanel("city",
+                                      fluidRow(
+                                        column(width=6,
+                                               "Choose a city by clicking on the map",
+                                               uiOutput(ns("city_name")),
+                                               checkboxInput(ns("city_selected"),
+                                                             "select city",
+                                                             value=FALSE)
+                                               ),#column
+                                        column(width=6,
+                                               plotOutput(ns("plot_city")))#column
+                                      )#fluidRow
 
-                                      selectInput(ns("name_city"),
-                                                  "Choose a city",
-                                                   choices=all_cities$name,
-                                                   selected="Lyon--France"),
-                                      plotOutput(ns("plot_city"))
                              ),#tabPanel
                              tabPanel("univar",
                                       plotOutput(ns("plot_distrib"))
@@ -51,7 +57,11 @@ mod_WP1_ui <- function(id){
                                       )#fluidRow
                              ),#tabPanel
                              tabPanel("data",
+                                      downloadButton(ns("download_btn"), "Download this data"),
                                       dataTableOutput(ns("tableclust"))
+                             ),#tabPanel
+                             tabPanel("test",
+                                      textOutput(ns("test"))
                              )#tabPanel
                            )#tabsetPanel
                     )#column
@@ -65,9 +75,18 @@ mod_WP1_ui <- function(id){
 mod_WP1_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+    #observe({updateCheckboxInput(session,"city_selected",value=r_get_city_selected())})
     r_all_cities=reactive({
-      glourbi::run_hclust(all_cities, nclust=input$nclust)
+      dataset=glourbi::run_hclust(all_cities, nclust=input$nclust)
+      dataset
     })
+    r_get_city=reactive({
+      if(is.null(input$global_map_marker_click$id)){
+        clickid="Lyon--France"}else{
+        clickid=input$global_map_marker_click$id}
+      clickid
+    })
+    output$city_name=renderUI({h2(r_get_city())})
     output$tableclust=renderDataTable({
       r_all_cities()
     })
@@ -106,8 +125,20 @@ mod_WP1_server <- function(id){
     })
     output$plot_city=renderPlot({
       glourbi::describe_city(dataset=r_all_cities(),
-                             input$name_city)
+                             r_get_city())
     })
+    output$test=renderText({
+      r_get_city()
+    })
+    output$download_btn <- downloadHandler(
+      filename = function() {
+        "GloUrb_WP1_table.csv"
+      },
+      content = function(file) {
+        write.csv(r_all_cities(), file)
+      }
+    )
+
   })
 }
 
