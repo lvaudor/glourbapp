@@ -1,4 +1,5 @@
 #remotes::install_github("lvaudor/glourbi")
 library(shiny)
 library(glourbi)
+data(cities)
 shinyApp(ui=glourbapp:::app_ui,server=glourbapp:::app_server)
