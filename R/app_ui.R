@@ -6,16 +6,18 @@
 #' @noRd
 app_ui <- function(request) {
     # Your application UI logic
-    fluidPage(
+
+      navbarPage(
       div(
-          img(
-            src = "www/GloUrb.png",
-            height = 120,
-            width = 120,
-            style = "margin:-11px -12px"
-          )
-        ),
-      mod_WP1_ui("WP1_1")
+        img(
+          src = "www/GloUrb_wide.png",
+          height = 35,
+          width = 100,
+          style = "margin: -15px -15px"
+        )
+      ),
+      tabPanel("General",mod_WP1_ui("WP1_1")),
+      tabPanel("OSM",mod_WP3_ui("WP3_1"))
     )
 
 }
