@@ -18,7 +18,7 @@ mod_WP3_ui <- function(id){
                          selected="Ahmedabad"),
              selectInput(ns("group"),
                          "Choose type",
-                         choices=unique(mapinfo$group)),
+                         choices=unique(map_elems_global$group)),
              plotOutput(ns("plot_osmglobal"))
              ),#column
       column(width=8,
