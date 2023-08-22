@@ -2,4 +2,5 @@
 library(shiny)
 library(glourbi)
 data(cities)
+data(map_elems_global)
 shinyApp(ui=glourbapp:::app_ui,server=glourbapp:::app_server)
