@@ -52,13 +52,16 @@ mod_WP3_server <- function(id){
       colorscale_vec=colorscale$color
       names(colorscale_vec)=colorscale$value
       ggplot2::ggplot(mapinfo,
-                      ggplot2::aes(x=value,y=nelems,fill=value))+
+                      ggplot2::aes(x=forcats::fct_reorder(value,group),y=nelems,fill=value, group=group))+
         ggplot2::geom_bar(stat="identity",color="dark grey")+
+        ggplot2::geom_text(ggplot2::aes(y=0, label=value),
+                           hjust = 0, nudge_x = 0.1)+
         ggplot2::coord_flip()+
         ggplot2::scale_fill_manual(values=colorscale_vec)+
         ggplot2::theme(legend.position="none")+
         ggplot2::scale_y_sqrt()+
-        ggplot2::facet_wrap(facets=ggplot2::vars(group))
+        ggplot2::scale_x_discrete(labels=mapinfo$group)+
+        ggplot2::xlab("")
     })
     output$map_city=leaflet::renderLeaflet({
       shape=  readRDS(system.file(
@@ -70,10 +73,17 @@ mod_WP3_server <- function(id){
         leaflet::addTiles(group = "OSM map") %>%
         leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery,
                          group = "Photo") %>%
+        leaflet::addTiles(
+          urlTemplate = "https://{s}.tile.thunderforest.com/{variant}/{z}/{x}/{y}.png?apikey={apikey}",
+          attribution = "&copy; <a href='http://www.thunderforest.com/'>Thunderforest</a>,  &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
+          options = leaflet::tileOptions(variant='neighbourhood', apikey = Sys.getenv("thunderforest_API_KEY")),
+          group="Neighbourhoods"
+        ) %>%
         leaflet::addLayersControl(
-              overlayGroups = c("OSM map","Photo"),
+              overlayGroups = c("OSM map","Photo","Neighbourhoods"),
               options = leaflet::layersControlOptions(collapsed = FALSE)) %>%
-        leaflet::hideGroup("Photo")
+        leaflet::hideGroup("Photo") %>%
+        leaflet::hideGroup("Neighbourhoods")
         print(mymap)
     })
 
