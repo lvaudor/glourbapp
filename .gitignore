@@ -1,4 +1,6 @@
 .Rproj.user
 data-raw
-inst
+inst/mapinfo
+inst/maps
+inst/shapes
 .Rhistory

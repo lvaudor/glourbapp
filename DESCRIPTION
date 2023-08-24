@@ -6,8 +6,10 @@ Description: PKG_DESC.
 License: What license is it under?
 Imports: 
     config,
+    glourbi,
     golem,
     leaflet,
+    magrittr,
     plotly,
     shiny
 Encoding: UTF-8

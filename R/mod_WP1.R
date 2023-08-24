@@ -17,8 +17,8 @@ mod_WP1_ui <- function(id){
                                   label="choose variable",
                                   selected="cluster",
                                   choices=c("cluster",
-                                            c(glourbi::sep_data(all_cities)$vars_cat,
-                                              glourbi::sep_data(all_cities)$vars_num))),
+                                            c(glourbi::sep_data(glourbi::all_cities)$vars_cat,
+                                              glourbi::sep_data(glourbi::all_cities)$vars_num))),
                       textOutput(ns("description_var")),
                       numericInput(ns("nclust"),
                                    "cluster: nb of classes",
@@ -73,7 +73,7 @@ mod_WP1_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     r_all_cities=reactive({
-      dataset=glourbi::run_hclust(all_cities, nclust=input$nclust)
+      dataset=glourbi::run_hclust(glourbi::all_cities, nclust=input$nclust)
       dataset
     })
     r_get_city=reactive({
@@ -87,7 +87,7 @@ mod_WP1_server <- function(id){
       r_all_cities()
     })
     output$description_var=renderText({
-      meta_all_cities %>%
+      glourbi::meta_all_cities %>%
         dplyr::filter(varname==input$select_var) %>%
         dplyr::select(description) %>%
         dplyr::pull()
