@@ -18,7 +18,7 @@ mod_WP3_ui <- function(id){
                          selected="Ahmedabad"),
              checkboxGroupInput(ns("group"),
                          "Choose type",
-                         choices=unique(map_elems_global$group)),
+                         choices=unique(glourbapp::map_elems_global$group)),
              plotOutput(ns("plot_osmglobal"))
              ),#column
       column(width=8,
