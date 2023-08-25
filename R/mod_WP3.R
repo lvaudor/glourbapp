@@ -14,7 +14,7 @@ mod_WP3_ui <- function(id){
       column(width=4,
              selectInput(ns("city"),
                          "Choose city",
-                         choices=cities,
+                         choices=glourbapp::cities,
                          selected="Ahmedabad"),
              checkboxGroupInput(ns("group"),
                          "Choose type",
