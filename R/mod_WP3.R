@@ -40,36 +40,37 @@ mod_WP3_server <- function(id){
       mapinfo=readRDS(system.file(
         paste0("mapinfo/mapinfo_",input$city,".RDS"),
         package="glourbapp")) %>%
-        dplyr::filter(nelems>0)
+        dplyr::filter(nelems>0)%>%
+        dplyr::filter(group %in% input$group)
       }
     )
     output$plot_osmglobal=renderPlot({
-      mapinfo=get_mapinfo() %>%
-        dplyr::filter(group %in% input$group)
-      colorscale=mapinfo %>%
-        dplyr::select(key,value,color) %>%
-        unique()
-      colorscale_vec=colorscale$color
-      names(colorscale_vec)=colorscale$value
-      ggplot2::ggplot(mapinfo,
-                      ggplot2::aes(x=forcats::fct_reorder(value,group),y=nelems,fill=value, group=group))+
-        ggplot2::geom_bar(stat="identity",color="dark grey")+
-        ggplot2::geom_text(ggplot2::aes(y=0, label=value),
-                           hjust = 0, nudge_x = 0.1)+
-        ggplot2::coord_flip()+
-        ggplot2::scale_fill_manual(values=colorscale_vec)+
-        ggplot2::theme(legend.position="none")+
-        ggplot2::scale_y_sqrt()+
-        ggplot2::scale_x_discrete(labels=mapinfo$group)+
-        ggplot2::xlab("")
+      if(length(input$group)>0){
+        mapinfo=get_mapinfo()
+        colorscale=mapinfo %>%
+          dplyr::select(key,value,color) %>%
+          unique()
+        colorscale_vec=colorscale$color
+        names(colorscale_vec)=colorscale$value
+        ggplot2::ggplot(mapinfo,
+                        ggplot2::aes(x=forcats::fct_reorder(value,group),y=nelems,fill=value, group=group))+
+          ggplot2::geom_bar(stat="identity",color="dark grey")+
+          ggplot2::geom_text(ggplot2::aes(y=0, label=value),
+                             hjust = 0, nudge_x = 0.1)+
+          ggplot2::coord_flip()+
+          ggplot2::scale_fill_manual(values=colorscale_vec)+
+          ggplot2::theme(legend.position="none")+
+          ggplot2::scale_y_sqrt()+
+          ggplot2::scale_x_discrete(labels=mapinfo$group)+
+          ggplot2::xlab("")
+        }
     })
     output$map_city=leaflet::renderLeaflet({
       shape=  readRDS(system.file(
                         paste0("shapes/shape_",input$city,".RDS"),
                         package="glourbapp"))
       mymap=leaflet::leaflet(shape) %>%
-        leaflet::addPolygons(fill=FALSE,color="red")
-      mymap=mymap %>%
+        leaflet::addPolygons(fill=FALSE,color="red")%>%
         leaflet::addTiles(group = "OSM map") %>%
         leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery,
                          group = "Photo") %>%
@@ -90,7 +91,7 @@ mod_WP3_server <- function(id){
     observe({
       mapinfo=get_mapinfo()
       mymap=leaflet::leafletProxy(ns("map_city"))
-      if(!is.null(input$group)){
+      if(nrow(mapinfo)>1){
       for (i in 1:nrow(mapinfo)){
         if(mapinfo$group[i] %in% input$group){
           mymap=mymap %>%
@@ -104,7 +105,7 @@ mod_WP3_server <- function(id){
           leaflet::clearGroup(mapinfo$value[i])
         }
       }# end for loop
-      }
+    }#end if
     })
   })
 }
