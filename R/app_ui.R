@@ -16,8 +16,13 @@ app_ui <- function(request) {
           style = "margin: -15px -15px"
         )
       ),
-      tabPanel("General",mod_WP1_ui("WP1_1")),
-      tabPanel("OSM",mod_WP3_ui("WP3_1"))
+      tabPanel("Global",mod_WP1_ui("WP1_1")),
+      tabPanel("City",mod_WP3_ui("WP3_1")),
+      tabPanel("Doc",
+               HTML(paste0("<p> To consult the documentation associated to this app",
+                           "please check <a href='https://lvaudor.github.io/glourbdoc/' ",
+                           "target='_blank'>",
+                           "this site</a>.")))
     )
 
 }
