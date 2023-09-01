@@ -16,8 +16,11 @@ mod_WP3_ui <- function(id){
                          "Choose city",
                          choices=glourbapp::cities,
                          selected="Ahmedabad"),
+             checkboxInput(ns("wikidata"),
+                           "Show Wikidata",
+                           value=FALSE),
              checkboxGroupInput(ns("group"),
-                         "Choose type",
+                         "OSM: Choose type",
                          choices=unique(glourbapp::map_elems_global$group)),
              plotOutput(ns("plot_osmglobal"))
              ),#column
@@ -39,14 +42,19 @@ mod_WP3_server <- function(id){
     get_mapinfo=reactive({
       mapinfo=readRDS(system.file(
         paste0("mapinfo/mapinfo_",input$city,".RDS"),
-        package="glourbapp")) %>%
+        package="glourbapp"))
+      }
+    )
+
+    get_mapinfo_group=reactive({
+      mapinfo=get_mapinfo() %>%
         dplyr::filter(nelems>0)%>%
         dplyr::filter(group %in% input$group)
-      }
+    }
     )
     output$plot_osmglobal=renderPlot({
       if(length(input$group)>0){
-        mapinfo=get_mapinfo()
+        mapinfo=get_mapinfo_group()
         colorscale=mapinfo %>%
           dplyr::select(key,value,color) %>%
           unique()
@@ -70,7 +78,7 @@ mod_WP3_server <- function(id){
                         paste0("shapes/shape_",input$city,".RDS"),
                         package="glourbapp"))
       mymap=leaflet::leaflet(shape) %>%
-        leaflet::addPolygons(fill=FALSE,color="red")%>%
+        leaflet::addPolygons(fill=FALSE,color="red") %>%
         leaflet::addTiles(group = "OSM map") %>%
         leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery,
                          group = "Photo") %>%
@@ -88,10 +96,10 @@ mod_WP3_server <- function(id){
         print(mymap)
     })
 
-    observe({
+    observeEvent(input$group,{
       mapinfo=get_mapinfo()
       mymap=leaflet::leafletProxy(ns("map_city"))
-      if(nrow(mapinfo)>1){
+     # if(nrow(mapinfo)>1){
       for (i in 1:nrow(mapinfo)){
         if(mapinfo$group[i] %in% input$group){
           mymap=mymap %>%
@@ -105,8 +113,25 @@ mod_WP3_server <- function(id){
           leaflet::clearGroup(mapinfo$value[i])
         }
       }# end for loop
-    }#end if
+    #}#end if
+
     })
+  observeEvent(input$wikidata,{
+    mymap=leaflet::leafletProxy(ns("map_city"))
+    if(input$wikidata){
+      mymap=mymap%>%
+        leaflet::addCircleMarkers(data=glourbapp::tib_wd_elems %>%
+                                    dplyr::filter(name==input$city),
+                                  popup=~popup,
+                                  color=~color,
+                                  group="wikidata")
+    }
+    if(!input$wikidata){
+      mymap=mymap %>%
+        leaflet::clearGroup("wikidata")
+    }
+  })
+
   })
 }
 
