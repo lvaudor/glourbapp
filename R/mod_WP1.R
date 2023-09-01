@@ -12,6 +12,9 @@ mod_WP1_ui <- function(id){
   tagList(
     golem_add_external_resources(),
     fluidRow(column(width=3,
+                    checkboxInput(ns("sampleA"),
+                                  "keep only cities from sample A",
+                                  value=FALSE),
                     wellPanel(
                       selectInput(ns("select_var"),
                                   label="choose variable",
@@ -20,11 +23,12 @@ mod_WP1_ui <- function(id){
                                             c(glourbi::sep_data(glourbi::all_cities)$vars_cat,
                                               glourbi::sep_data(glourbi::all_cities)$vars_num))),
                       textOutput(ns("description_var")),
-                      numericInput(ns("nclust"),
-                                   "cluster: nb of classes",
-                                   min=2,max=30, value=2),
-                      checkboxInput(ns("distrib_by_class"),
-                                    "display univar distribution by cluster")
+                      conditionalPanel(
+                        condition = "input.select_var == 'cluster'",ns=ns,
+                        numericInput(ns("nclust"),
+                                     "cluster: nb of classes",
+                                     min=2,max=30, value=2)
+                      )
                     ),#wellPanel
                     plotOutput(ns("plot_palette"))
                     ),#column
@@ -43,6 +47,8 @@ mod_WP1_ui <- function(id){
 
                              ),#tabPanel
                              tabPanel("univar",
+                                      checkboxInput(ns("distrib_by_class"),
+                                                    "display univar distribution by cluster"),
                                       plotOutput(ns("plot_distrib"))
                              ),#tabPanel
                              tabPanel("multivar",
@@ -52,6 +58,12 @@ mod_WP1_ui <- function(id){
                                         column(width=6,
                                                plotly::plotlyOutput(ns("indpcaplot")))
                                       )#fluidRow
+                             ),#tabPanel
+                             tabPanel("boxplots",
+                                      checkboxInput(ns("display_ranks"),
+                                                    label="display ranks",
+                                                    value=TRUE),
+                                      plotOutput(ns("description_clusters"))
                              ),#tabPanel
                              tabPanel("data",
                                       downloadButton(ns("download_btn"), "Download this data"),
@@ -73,7 +85,11 @@ mod_WP1_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     r_all_cities=reactive({
+      input$nclust
+      input$sampleA
+      indA=which(glourbi::all_cities$selectA)
       dataset=glourbi::run_hclust(glourbi::all_cities, nclust=input$nclust)
+      if(input$sampleA){dataset=dataset[indA,]}
       dataset
     })
     r_get_city=reactive({
@@ -122,6 +138,10 @@ mod_WP1_server <- function(id){
     output$plot_city=renderPlot({
       glourbi::describe_city(dataset=r_all_cities(),
                              r_get_city())
+    })
+    output$description_clusters=renderPlot({
+      glourbi::describe_clusters(dataset=r_all_cities(),
+                                 display_ranks=input$display_ranks)
     })
     output$test=renderText({
       r_get_city()
