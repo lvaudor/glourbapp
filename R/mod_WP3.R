@@ -63,7 +63,7 @@ mod_WP3_server <- function(id){
         ggplot2::ggplot(mapinfo,
                         ggplot2::aes(x=forcats::fct_reorder(value,group),y=nelems,fill=value, group=group))+
           ggplot2::geom_bar(stat="identity",color="dark grey")+
-          ggplot2::geom_text(ggplot2::aes(y=0, label=value),
+          ggplot2::geom_text(ggplot2::aes(y=0, label=value),size=8,
                              hjust = 0, nudge_x = 0.1)+
           ggplot2::coord_flip()+
           ggplot2::scale_fill_manual(values=colorscale_vec)+
@@ -124,6 +124,7 @@ mod_WP3_server <- function(id){
                                     dplyr::filter(name==input$city),
                                   popup=~popup,
                                   color=~color,
+                                  stroke=FALSE,fillOpacity=0.8,radius=5,
                                   group="wikidata")
     }
     if(!input$wikidata){

@@ -17,7 +17,12 @@ app_ui <- function(request) {
         )
       ),
       tabPanel("Global",mod_WP1_ui("WP1_1")),
-      tabPanel("City",mod_WP3_ui("WP3_1")),
+      tabPanel("Explore datasets",
+               p("This tab gathers exploratory results about a small portion of all considered cities"),
+               tabsetPanel(tabPanel("OSM",mod_WP3_ui("WP3_1")),
+                           tabPanel("SERP",mod_webtext_ui("webtext_1"))
+                           ),#tabsetPanel 2
+              ),#tabPanel "Explore datasets"
       tabPanel("Doc",
                HTML(paste0("<p> To consult the documentation associated to this app",
                            "please check <a href='https://lvaudor.github.io/glourbdoc/' ",

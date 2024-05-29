@@ -20,8 +20,8 @@ mod_WP1_ui <- function(id){
                                   label="choose variable",
                                   selected="cluster",
                                   choices=c("cluster",
-                                            c(glourbi::sep_data(glourbi::all_cities)$vars_cat,
-                                              glourbi::sep_data(glourbi::all_cities)$vars_num))),
+                                            c(glourbi::sep_vars(glourbi::all_cities)$vars_cat,
+                                              glourbi::sep_vars(glourbi::all_cities)$vars_num))),
                       textOutput(ns("description_var")),
                       conditionalPanel(
                         condition = "input.select_var == 'cluster'",ns=ns,
