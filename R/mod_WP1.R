@@ -87,17 +87,10 @@ mod_WP1_server <- function(id){
     ns <- session$ns
     r_all_cities=reactive({
       input$nclust
-<<<<<<< HEAD
       input$selection
       dataset=glourbi::run_hclust(glourbi::all_cities, nclust=input$nclust)
       if(input$selection=="selection 0"){dataset=dataset}
       if(input$selection=="selection 1"){dataset=dataset %>% dplyr::filter(selection1==TRUE)}
-=======
-      input$sample1
-      ind1=which(glourbi::all_cities$selection1)
-      dataset=glourbi::run_hclust(glourbi::all_cities, nclust=input$nclust)
-      if(input$sample1){dataset=dataset[ind1,]}
->>>>>>> 6f97bd6 (add describe_clusters and filter to sampleA)
       dataset
     })
     r_get_city=reactive({
