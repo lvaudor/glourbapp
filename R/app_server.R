@@ -8,4 +8,6 @@ app_server <- function(input, output, session) {
   # Your application server logic
   mod_WP1_server("WP1_1")
   mod_WP3_server("WP3_1")
+  mod_webtext_server("webtext_1")
+  mod_percity_server("percity_1")
 }

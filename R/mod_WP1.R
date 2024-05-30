@@ -12,16 +12,17 @@ mod_WP1_ui <- function(id){
   tagList(
     golem_add_external_resources(),
     fluidRow(column(width=3,
-                    checkboxInput(ns("sampleA"),
-                                  "keep only cities from sample A",
-                                  value=FALSE),
+                    radioButtons(ns("selection"),
+                                 "cities in selection",
+                                 c("selection 0","selection 1"),
+                                 selected="selection 0"),
                     wellPanel(
                       selectInput(ns("select_var"),
                                   label="choose variable",
                                   selected="cluster",
                                   choices=c("cluster",
-                                            c(glourbi::sep_data(glourbi::all_cities)$vars_cat,
-                                              glourbi::sep_data(glourbi::all_cities)$vars_num))),
+                                            c(glourbi::sep_vars(glourbi::all_cities)$vars_cat,
+                                              glourbi::sep_vars(glourbi::all_cities)$vars_num))),
                       textOutput(ns("description_var")),
                       conditionalPanel(
                         condition = "input.select_var == 'cluster'",ns=ns,
@@ -86,10 +87,10 @@ mod_WP1_server <- function(id){
     ns <- session$ns
     r_all_cities=reactive({
       input$nclust
-      input$sampleA
-      indA=which(glourbi::all_cities$selectA)
+      input$selection
       dataset=glourbi::run_hclust(glourbi::all_cities, nclust=input$nclust)
-      if(input$sampleA){dataset=dataset[indA,]}
+      if(input$selection=="selection 0"){dataset=dataset}
+      if(input$selection=="selection 1"){dataset=dataset %>% dplyr::filter(selection1==TRUE)}
       dataset
     })
     r_get_city=reactive({
@@ -118,6 +119,7 @@ mod_WP1_server <- function(id){
                         type="var")
     })
     output$indpcaplot=plotly::renderPlotly({
+      print(colnames(r_all_cities()))
       glourbi::plot_pca(dataset=r_all_cities(),
                         r_calc_pca(),
                         type="ind")
