@@ -9,6 +9,8 @@
 #' @importFrom shiny NS tagList
 mod_percity_ui <- function(id){
   ns <- NS(id)
+
+  selection1=glourbi::all_cities %>% dplyr::filter(selection1==TRUE) %>% dplyr::pull(Urban.Aggl)
   tagList(
     fluidRow(
       column(width=4,
@@ -47,7 +49,7 @@ mod_percity_server <- function(id){
                              color=~reach_color) %>%
         leaflet::addTiles(group = "OSM map") %>%
         leaflet::addTiles(
-          urlTemplate = "https://storage.googleapis.com/global-surface-water/tiles2021/transitions/{z}/{x}/{y}.png",
+          urlTemplate = "https://storage.googleapis.com/global-surface-water/tiles2021/change/{z}/{x}/{y}.png",
           attribution = "2016 EC JRC/Google",
           group="GWS") %>%
         leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery,

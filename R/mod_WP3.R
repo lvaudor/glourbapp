@@ -80,6 +80,10 @@ mod_WP3_server <- function(id){
       mymap=leaflet::leaflet(shape) %>%
         leaflet::addPolygons(fill=FALSE,color="red") %>%
         leaflet::addTiles(group = "OSM map") %>%
+        leaflet::addTiles(
+          urlTemplate = "https://storage.googleapis.com/global-surface-water/tiles2021/change/{z}/{x}/{y}.png",
+          attribution = "2016 EC JRC/Google",
+          group="GWS") %>%
         leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery,
                          group = "Photo") %>%
         leaflet::addTiles(
@@ -89,7 +93,7 @@ mod_WP3_server <- function(id){
           group="Neighbourhoods"
         ) %>%
         leaflet::addLayersControl(
-              overlayGroups = c("OSM map","Photo","Neighbourhoods"),
+              overlayGroups = c("OSM map","GWS","Photo","Neighbourhoods"),
               options = leaflet::layersControlOptions(collapsed = FALSE)) %>%
         leaflet::hideGroup("Photo") %>%
         leaflet::hideGroup("Neighbourhoods")
