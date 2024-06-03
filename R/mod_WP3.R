@@ -80,12 +80,12 @@ mod_WP3_server <- function(id){
       mymap=leaflet::leaflet(shape) %>%
         leaflet::addPolygons(fill=FALSE,color="red") %>%
         leaflet::addTiles(group = "OSM map") %>%
+        leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery,
+                         group = "Photo") %>%
         leaflet::addTiles(
           urlTemplate = "https://storage.googleapis.com/global-surface-water/tiles2021/change/{z}/{x}/{y}.png",
           attribution = "2016 EC JRC/Google",
           group="GWS") %>%
-        leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery,
-                         group = "Photo") %>%
         leaflet::addTiles(
           urlTemplate = "https://{s}.tile.thunderforest.com/{variant}/{z}/{x}/{y}.png?apikey={apikey}",
           attribution = "&copy; <a href='http://www.thunderforest.com/'>Thunderforest</a>,  &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>",

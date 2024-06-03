@@ -48,23 +48,25 @@ mod_percity_server <- function(id){
         leaflet::addPolygons(fill=FALSE,
                              color=~reach_color) %>%
         leaflet::addTiles(group = "OSM map") %>%
-        leaflet::addTiles(
-          urlTemplate = "https://storage.googleapis.com/global-surface-water/tiles2021/change/{z}/{x}/{y}.png",
-          attribution = "2016 EC JRC/Google",
-          group="GWS") %>%
+        leaflet::addWMSTiles(
+          baseUrl = "https://sedac.ciesin.columbia.edu/geoserver/wms",
+          layers = "gpw-v4:gpw-v4-population-density-rev11_2020",
+          options = leaflet::WMSTileOptions(format = "image/png", transparent = TRUE),
+          attribution = "SEDAC pop density V4",
+          group="PopDensity_SEDAC"
+        ) %>%
         leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery,
                                   group = "Photo") %>%
         leaflet::addTiles(
-          urlTemplate = "https://{s}.tile.thunderforest.com/{variant}/{z}/{x}/{y}.png?apikey={apikey}",
-          attribution = "&copy; <a href='http://www.thunderforest.com/'>Thunderforest</a>,  &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
-          options = leaflet::tileOptions(variant='neighbourhood', apikey = Sys.getenv("thunderforest_API_KEY")),
-          group="Neighbourhoods"
-        ) %>%
+          urlTemplate = "https://storage.googleapis.com/global-surface-water/tiles2021/change/{z}/{x}/{y}.png",
+          attribution = "2016 EC JRC/Google",
+          group="Global Water Surface") %>%
         leaflet::addLayersControl(
-          overlayGroups = c("OSM map","GWS","Photo","Neighbourhoods"),
+          baseGroups=c("OSM map","PopDensity_SEDAC","Photo"),
+          overlayGroups = c("Global Water Surface"),
           options = leaflet::layersControlOptions(collapsed = FALSE)) %>%
         leaflet::hideGroup("Photo") %>%
-        leaflet::hideGroup("Neighbourhoods")
+        leaflet::hideGroup("PopDensity_SEDAC")
       print(mymap)
     })
 
