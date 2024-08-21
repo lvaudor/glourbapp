@@ -10,17 +10,24 @@
 mod_percity_ui <- function(id){
   ns <- NS(id)
 
-  selection1=glourbi::all_cities %>% dplyr::filter(selection1==TRUE) %>% dplyr::pull(Urban.Aggl)
+  selection1=glourbi::all_cities %>%
+    dplyr::filter(selection1==TRUE) %>%
+    dplyr::arrange(Urban.Aggl) %>%
+    dplyr::pull(Urban.Aggl)
   tagList(
     fluidRow(
       column(width=4,
              selectInput(ns("city"),
                          "Choose city",
                          choices=selection1,
-                         selected=selection1[1])
+                         selected=selection1[1]),
+             tableOutput(ns("GSWtable"))
       ),#column
       column(width=8,
-             leaflet::leafletOutput(ns("map_city"),height=800)
+             tabsetPanel(
+               tabPanel("map",leaflet::leafletOutput(ns("map_city"),height=600)),
+               tabPanel("GSW distribution",plotOutput(ns("GSWdensity")))
+             )
       )#column
     )#fluidRow
 
@@ -34,6 +41,28 @@ mod_percity_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    get_GSWdensity=reactive({
+      GSWdensity=readRDS(system.file(
+        "GSWdensity.RDS",
+        package="glourbapp")) %>%
+        dplyr::filter(UrbanAggl==input$city) %>%
+        dplyr::ungroup()
+      print(head(GSWdensity))
+      GSWdensity
+    }
+    )
+
+
+    output$GSWdensity=renderPlot({
+      plot_density(get_GSWdensity())
+    })
+    output$GSWtable=renderTable({
+      get_GSWdensity() %>%
+        dplyr::mutate(means=purrr::map(density,"dat_means")) %>%
+        dplyr::select(zone,reach,means) %>%
+        tidyr::unnest(cols=c(means))
+    }
+    )
     output$map_city=leaflet::renderLeaflet({
       CityCode=glourbi::all_cities %>%
         dplyr::filter(Urban.Aggl==input$city) %>%
