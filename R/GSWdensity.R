@@ -80,8 +80,9 @@ plot_density=function(city_GSWdensity){
     tidyr::unnest(cols=c(means))
   print(head(dat_obs))
   ggplot2::ggplot(dat_obs, ggplot2::aes(x = values) )+
-    ggplot2::facet_wrap(facets=dplyr::vars(title),#rows=dplyr::vars(zone),cols=dplyr::vars(reach),
-      scales="free")+
+    ggplot2::facet_wrap(facets=dplyr::vars(title),
+                        ncol=2,nrow=3,
+                        scales="free")+
     ggplot2::geom_histogram(fill="light grey",alpha=0.5,binwidth=1)+
     ggplot2::geom_line(data=dat_density,
                        ggplot2::aes(x=x,y=y,col=cat))+

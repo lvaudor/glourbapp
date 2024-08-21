@@ -26,7 +26,8 @@ mod_percity_ui <- function(id){
       column(width=8,
              tabsetPanel(
                tabPanel("map",leaflet::leafletOutput(ns("map_city"),height=600)),
-               tabPanel("GSW distribution",plotOutput(ns("GSWdensity")))
+               tabPanel("GSW distribution",plotOutput(ns("GSWdensity"),
+                                                      width="650px",height="750px"))
              )
       )#column
     )#fluidRow
@@ -46,7 +47,11 @@ mod_percity_server <- function(id){
         "GSWdensity.RDS",
         package="glourbapp")) %>%
         dplyr::filter(UrbanAggl==input$city) %>%
-        dplyr::ungroup()
+        dplyr::ungroup() %>%
+        dplyr::mutate(reach=dplyr::case_when(reach=="upstream"~"1_upstream",
+                                      reach=="downstream"~"3_downstream",
+                                      reach=="urban"~"2_urban")) %>%
+        dplyr::arrange(reach,zone)
       print(head(GSWdensity))
       GSWdensity
     }
@@ -54,8 +59,10 @@ mod_percity_server <- function(id){
 
 
     output$GSWdensity=renderPlot({
+      print(plot_density)
       plot_density(get_GSWdensity())
-    })
+    }
+    )
     output$GSWtable=renderTable({
       get_GSWdensity() %>%
         dplyr::mutate(means=purrr::map(density,"dat_means")) %>%
