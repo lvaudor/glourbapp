@@ -16,18 +16,19 @@ mod_percity_ui <- function(id){
     dplyr::pull(Urban.Aggl)
   tagList(
     fluidRow(
-      column(width=4,
+      column(width=6,
              selectInput(ns("city"),
                          "Choose city",
                          choices=selection1,
                          selected=selection1[1]),
-             tableOutput(ns("GSWtable"))
+             #checkboxInput("onlyGSW","only cities with GSW density"),
+             DT::DTOutput(ns("GSWtable"))
       ),#column
-      column(width=8,
+      column(width=6,
              tabsetPanel(
                tabPanel("map",leaflet::leafletOutput(ns("map_city"),height=600)),
                tabPanel("GSW distribution",plotOutput(ns("GSWdensity"),
-                                                      width="650px",height="750px"))
+                                                      width="400px",height="500px"))
              )
       )#column
     )#fluidRow
@@ -48,33 +49,33 @@ mod_percity_server <- function(id){
         package="glourbapp")) %>%
         dplyr::filter(UrbanAggl==input$city) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(reach=dplyr::case_when(reach=="upstream"~"1_upstream",
-                                      reach=="downstream"~"3_downstream",
-                                      reach=="urban"~"2_urban")) %>%
         dplyr::arrange(reach,zone)
-      print(head(GSWdensity))
       GSWdensity
     }
     )
-
-
     output$GSWdensity=renderPlot({
-      print(plot_density)
-      plot_density(get_GSWdensity())
-    }
-    )
-    output$GSWtable=renderTable({
-      get_GSWdensity() %>%
-        dplyr::mutate(means=purrr::map(density,"dat_means")) %>%
-        dplyr::select(zone,reach,means) %>%
-        tidyr::unnest(cols=c(means))
+      glourbapp:::plot_density(get_GSWdensity())
+    })
+    output$GSWtable=DT::renderDT({
+      GSW_summary=readRDS(system.file(
+        "GSW_summary.RDS",
+        package="glourbapp")) %>%
+        dplyr::filter(UrbanAggl==input$city) %>%
+        dplyr::select(-UrbanAggl) %>%
+        dplyr::mutate(prop=round(prop,2),
+                      mean=round(mean,2),
+                      n=round(n),
+                      sd=round(sd,2),
+                      case=paste(reach,zone,sep="-")) %>%
+        dplyr::select(case,change,cat,mean,sd,n,prop)
+      DT::datatable(GSW_summary)
     }
     )
     output$map_city=leaflet::renderLeaflet({
       CityCode=glourbi::all_cities %>%
         dplyr::filter(Urban.Aggl==input$city) %>%
         dplyr::pull(ID)
-      path=system.file("per_city/",package="glourbapp")
+      path=system.file("per_city/",package="glourbi")
       shape=sf::st_read(paste0(path,CityCode,".shp")) %>%
         sf::st_transform(crs = 4326) %>%
         dplyr::mutate(reach_color=dplyr::case_when(reach=="city"~"red",

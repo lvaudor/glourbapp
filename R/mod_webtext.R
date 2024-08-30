@@ -19,7 +19,7 @@ mod_webtext_ui <- function(id){
               plotOutput(ns("plotwords"))
    ),#column1
    column(width=8,
-          dataTableOutput(ns("tib_cityriver"))
+          DT::dataTableOutput(ns("tib_cityriver"))
    )#column2
     )#fluidRow
 
@@ -59,7 +59,7 @@ mod_webtext_server <- function(id){
         ggplot2::ylab("frequency")
 
     })
-    output$tib_cityriver=renderDataTable({
+    output$tib_cityriver=DT::renderDT({
       get_cityriver_urls() %>%
         dplyr::mutate(link=glue::glue("<a href='{link}' target='_blank'>{link}</a>"))
     },escape=FALSE)

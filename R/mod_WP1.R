@@ -68,7 +68,7 @@ mod_WP1_ui <- function(id){
                              ),#tabPanel
                              tabPanel("data",
                                       downloadButton(ns("download_btn"), "Download this data"),
-                                      dataTableOutput(ns("tableclust"))
+                                      DT::dataTableOutput(ns("tableclust"))
                              ),#tabPanel
                              tabPanel("test",
                                       textOutput(ns("test"))
@@ -100,7 +100,7 @@ mod_WP1_server <- function(id){
       clickid
     })
     output$city_name=renderUI({h2(r_get_city())})
-    output$tableclust=renderDataTable({
+    output$tableclust=DT::renderDT({
       r_all_cities()
     })
     output$description_var=renderText({
