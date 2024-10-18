@@ -18,7 +18,7 @@ plot_density_facet=function(GSWdensity,selected_reach,selected_zone){
     dplyr::filter(reach==selected_reach,
                   zone==selected_zone)
   n=dat$max_extent
-  dat_frequency=glourbapp:::gmm_density(dat$gmm_results[[1]]) %>%
+  dat_frequency=gmm_density(dat$gmm_results[[1]]) %>%
     dplyr::mutate(y=y*n)
   dat_means=dat$gmm_results[[1]]
   dat_decile_density=dat$decile_density[[1]]
@@ -40,7 +40,7 @@ plot_density_facet=function(GSWdensity,selected_reach,selected_zone){
 plot_density=function(city_GSWdensity){
   result=city_GSWdensity %>%
     dplyr::mutate(plots=purrr::map2(.x=reach,.y=zone,
-                                    ~glourbapp:::plot_density_facet(city_GSWdensity,
+                                    ~plot_density_facet(city_GSWdensity,
                                                  selected_reach=.x,
                                                  selected_zone=.y)))
   get_result=function(selected_reach,selected_zone){
