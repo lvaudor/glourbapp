@@ -5,4 +5,7 @@ inst/mapinfo
 inst/maps
 inst/shapes
 inst/data_serp
+app_cache/
 .Rhistory
+.Renviron
+.Renviron.prod

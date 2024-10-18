@@ -15,20 +15,24 @@ mod_percity_ui <- function(id){
     dplyr::arrange(Urban.Aggl) %>%
     dplyr::pull(Urban.Aggl)
   tagList(
+
+    selectInput(ns("city"),
+                "Choose city",
+                choices=selection1,
+                selected=selection1[1]),
     fluidRow(
       column(width=6,
-             selectInput(ns("city"),
-                         "Choose city",
-                         choices=selection1,
-                         selected=selection1[1]),
              #checkboxInput("onlyGSW","only cities with GSW density"),
-             DT::DTOutput(ns("GSWtable"))
+             leaflet::leafletOutput(ns("map_city"),height=600)
       ),#column
       column(width=6,
              tabsetPanel(
-               tabPanel("map",leaflet::leafletOutput(ns("map_city"),height=600)),
-               tabPanel("GSW distribution",plotOutput(ns("GSWdensity"),
-                                                      width="400px",height="500px"))
+               tabPanel("GSW description",
+                        plotOutput(ns("GSWdescription"),
+                                   width="700px",
+                                   height="600px")),
+               tabPanel("GSW table",
+                        DT::DTOutput(ns("GSWtable")))
              )
       )#column
     )#fluidRow
@@ -39,36 +43,61 @@ mod_percity_ui <- function(id){
 #' percity Server Functions
 #'
 #' @noRd
-mod_percity_server <- function(id){
+mod_percity_server <- function(id,conn){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    get_GSWdensity=reactive({
-      GSWdensity=readRDS(system.file(
-        "GSWdensity.RDS",
-        package="glourbapp")) %>%
-        dplyr::filter(UrbanAggl==input$city) %>%
-        dplyr::ungroup() %>%
-        dplyr::arrange(reach,zone)
-      GSWdensity
-    }
-    )
+    r_get_gsw_patches_summary=reactive({
+      thisCityCode=glourbi::to_citycode(input$city)
+      tib=glourbi::get_city_sf(name="gsw_patches_summary",
+                               thisCityCode,
+                               conn=conn)
+    })
+
+    output$GSWdescription=renderPlot({
+      result=r_get_gsw_patches_summary()%>%
+        sf::st_drop_geometry() %>%
+        dplyr::as_tibble()%>%
+        dplyr::mutate(reach=factor(reach, levels=c("upstream","city","downstream"))) %>%
+        dplyr::mutate(IDrow=1:dplyr::n())
+
+      result1=result %>%
+        dplyr::select(IDrow,dplyr::starts_with("ntype")) %>%
+        tidyr::pivot_longer(cols=dplyr::starts_with("ntype_"),names_to="type",values_to="ntype",names_prefix="ntype_")
+      result2=result %>%
+        dplyr::select(IDrow,dplyr::starts_with("mutype")) %>%
+        tidyr::pivot_longer(cols=dplyr::starts_with("mutype_"),names_to="type",values_to="mutype",names_prefix="mutype_")
+      result=result %>%
+        dplyr::select(-dplyr::starts_with("ntype_"),
+               -dplyr::starts_with("mutype_")) %>%
+        dplyr::left_join(result1,by=c("IDrow")) %>%
+        dplyr::left_join(result2,by=c("IDrow","type")) %>%
+        dplyr::select(-IDrow)
+      ggplot2::ggplot(result,
+                      ggplot2::aes(x=sizepatch, y=ntype,fill=type, alpha=abs(mutype)/100))+
+        ggplot2::geom_bar(stat="identity")+
+        ggplot2::facet_grid(rows=ggplot2::vars(reach),cols=ggplot2::vars(zone))+
+        ggplot2::scale_fill_manual(values=c("red","black","green"))+
+        ggplot2::theme(legend.position="none")
+    })
+
     output$GSWdensity=renderPlot({
-      glourbapp:::plot_density(get_GSWdensity())
+      conn=glourbi::connect_to_sandbox()
+      gsw_result=gsw::gsw_summary(input$city,conn)
+      DBI::dbDisconnect(conn)
+      gsw::gsw_summary_plot(gsw_result)
     })
     output$GSWtable=DT::renderDT({
-      GSW_summary=readRDS(system.file(
-        "GSW_summary.RDS",
-        package="glourbapp")) %>%
-        dplyr::filter(UrbanAggl==input$city) %>%
-        dplyr::select(-UrbanAggl) %>%
-        dplyr::mutate(prop=round(prop,2),
-                      mean=round(mean,2),
-                      n=round(n),
-                      sd=round(sd,2),
-                      case=paste(reach,zone,sep="-")) %>%
-        dplyr::select(case,change,cat,mean,sd,n,prop)
-      DT::datatable(GSW_summary)
+      result=r_get_gsw_patches_summary() %>%
+        sf::st_drop_geometry() %>%
+        dplyr::select(reach,zone,sizepatch,npatches,
+                      n_neg=ntype_neg,
+                      n_neutral=ntype_neutral,
+                      n_pos=ntype_pos,
+                      mu_neg=mutype_neg,
+                      mu_neutral=mutype_neutral,
+                      mu_pos=mutype_pos)
+      DT::datatable(result)
     }
     )
     output$map_city=leaflet::renderLeaflet({
@@ -81,29 +110,46 @@ mod_percity_server <- function(id){
         dplyr::mutate(reach_color=dplyr::case_when(reach=="city"~"red",
                                             reach=="upstream"~"blue",
                                             reach=="downstream"~"purple"))
+      sf::sf_use_s2(FALSE)
+      patches=r_get_gsw_patches_summary() %>%
+        dplyr::select(sizepatch) %>%
+        dplyr::mutate(geometry = dplyr::if_else(sf::st_is(geometry, "GEOMETRYCOLLECTION"),
+                                  sf::st_union(sf::st_collection_extract(geometry, "POLYGON")),
+                                  geometry)) %>%
+        sf::st_as_sf() %>%
+        dplyr::mutate(sizepatch_color=dplyr::case_when(sizepatch=="1_small"~"coral",
+                                                sizepatch=="2_medium"~"orange",
+                                                sizepatch=="3_largest"~"yellow"))
+
+
       mymap=leaflet::leaflet(shape) %>%
         leaflet::addPolygons(fill=FALSE,
                              color=~reach_color) %>%
+        leaflet::addPolygons(data=patches,
+                             fillColor=~sizepatch_color,
+                             fill=TRUE,stroke=FALSE,
+                             group="water patches size") %>%
         leaflet::addTiles(group = "OSM map") %>%
         leaflet::addWMSTiles(
-          baseUrl = "https://sedac.ciesin.columbia.edu/geoserver/wms",
-          layers = "gpw-v4:gpw-v4-population-density-rev11_2020",
-          options = leaflet::WMSTileOptions(format = "image/png", transparent = TRUE),
-          attribution = "SEDAC pop density V4",
-          group="PopDensity_SEDAC"
+          baseUrl = "https://geoserver-dev.evs.ens-lyon.fr/geoserver/glourb/wms?",
+          layers = "gsw_change",  # Le nom de la couche
+          options = leaflet::WMSTileOptions(
+            version = "1.1.0",
+            format = "image/png",
+            transparent = TRUE,
+            crs = "EPSG:4326"
+          ),
+          attribution = "2016 EC JRC/Google",
+          group="GSW change intensity"
         ) %>%
         leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery,
                                   group = "Photo") %>%
-        leaflet::addTiles(
-          urlTemplate = "https://storage.googleapis.com/global-surface-water/tiles2021/change/{z}/{x}/{y}.png",
-          attribution = "2016 EC JRC/Google",
-          group="Global Water Surface") %>%
         leaflet::addLayersControl(
-          baseGroups=c("OSM map","PopDensity_SEDAC","Photo"),
-          overlayGroups = c("Global Water Surface"),
+          overlayGroups = c("OSM map","Photo","GSW change intensity","water patches size"),
           options = leaflet::layersControlOptions(collapsed = FALSE)) %>%
         leaflet::hideGroup("Photo") %>%
-        leaflet::hideGroup("PopDensity_SEDAC")
+        leaflet::hideGroup("water patches size")
+
       print(mymap)
     })
 

@@ -13,12 +13,12 @@ mod_WP1_ui <- function(id){
     golem_add_external_resources(),
     fluidRow(column(width=3,
                     radioButtons(ns("selection"),
-                                 "cities in selection",
-                                 c("selection 0","selection 1"),
-                                 selected="selection 0"),
+                                 "Show cities in selection",
+                                 c("Selection 0 (993)","Selection 1 (298)"),
+                                 selected="Selection 0 (993)"),
                     wellPanel(
                       selectInput(ns("select_var"),
-                                  label="choose variable",
+                                  label="choose variable)",
                                   selected="cluster",
                                   choices=c("cluster",
                                             c(glourbi::sep_vars(glourbi::all_cities)$vars_cat,
@@ -89,8 +89,8 @@ mod_WP1_server <- function(id){
       input$nclust
       input$selection
       dataset=glourbi::run_hclust(glourbi::all_cities, nclust=input$nclust)
-      if(input$selection=="selection 0"){dataset=dataset}
-      if(input$selection=="selection 1"){dataset=dataset %>% dplyr::filter(selection1==TRUE)}
+      if(input$selection=="Selection 0 (993)"){dataset=dataset}
+      if(input$selection=="Selection 1 (298)"){dataset=dataset %>% dplyr::filter(selection1==TRUE)}
       dataset
     })
     r_get_city=reactive({
@@ -116,13 +116,18 @@ mod_WP1_server <- function(id){
     output$varpcaplot=plotly::renderPlotly({
       glourbi::plot_pca(dataset=r_all_cities(),
                         r_calc_pca(),
-                        type="var")
+                        type="var",
+                        highlight_subset=r_all_cities() %>%
+                          dplyr::filter(ID==r_get_city()))
     })
     output$indpcaplot=plotly::renderPlotly({
-      print(colnames(r_all_cities()))
+      highlight_subset=r_all_cities() %>%
+        dplyr::filter(name==r_get_city())
+      print(highlight_subset)
       glourbi::plot_pca(dataset=r_all_cities(),
                         r_calc_pca(),
-                        type="ind")
+                        type="ind",
+                        highlight_subset=highlight_subset)
     })
     output$global_map=leaflet::renderLeaflet({
       glourbi::global_map(dataset=r_all_cities(),

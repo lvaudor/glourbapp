@@ -7,30 +7,71 @@
 app_ui <- function(request) {
     # Your application UI logic
 
+  tagList(
+    # Inject custom CSS into the app for tab styling
+    tags$style(
+      HTML("
+      /* Hover effect */
+      .nav-pills > li > a:hover {
+        background-color: #E3EBF7; /* Background color on hover */
+      }
+
+      /* Help-guide button placement */
+      .help-btn {
+          position: absolute;
+          right: 18px;
+          top: 10px;
+          z-index: 1000; /* Make sure it's above other UI elements */
+        }
+
+      .navbar {
+        position: relative;
+      }
+    ")
+    ),
+
+  # Define the help button outside of navbarPage, but position it inside with CSS
+      div(class = "help-btn",
+          mod_help_ui("help_1") # Use the cicerone UI module here
+      ),
+
       navbarPage(
-      div(
+        id="main_menu_tab",
+      title=
         img(
           src = "www/GloUrb_wide.png",
           height = 35,
-          width = 100,
-          style = "margin: -15px -15px"
-        )
-      ),
-      tabPanel("Global",mod_WP1_ui("WP1_1")),
-      tabPanel("Per_city",mod_percity_ui("percity_1")),
-      tabPanel("Explore datasets",
-               p("This tab gathers exploratory results about a small portion of all considered cities"),
-               tabsetPanel(tabPanel("OSM",mod_WP3_ui("WP3_1")),
-                           tabPanel("SERP",mod_webtext_ui("webtext_1"))
-                           ),#tabsetPanel 2
-              ),#tabPanel "Explore datasets"
+          width = 100
+        ),
+      tabPanel("Global",
+               icon = icon("globe"),
+               mod_WP1_ui("WP1_1")),
+      tabPanel("Surface Water",
+               icon = icon("droplet"),
+               mod_percity_ui("percity_1")),
+      tabPanel("Discourses",
+               icon=icon("comment"),
+               mod_webtext_ui("webtext_1")),
+      tabPanel("OpenStreetMap",
+               icon=icon("map"),
+               mod_WP3_ui("WP3_1")),
+      # tabPanel("WikiMedia",
+      #          mod_WDWP_ui("WDWP_1")),
       tabPanel("Doc",
+               icon=icon("circle-info"),
                HTML(paste0("<p> To consult the documentation associated to this app",
                            "please check <a href='https://lvaudor.github.io/glourbdoc/' ",
                            "target='_blank'>",
-                           "this site</a>.")))
-    )
+                           "this site</a>."))),
+      theme = bslib::bs_theme(version = 5, bootswatch = "united",
+      primary = "#308F10",
+      #secondary="#009CDE"
+      #primary = "#000000",
+      secondary="#909090"
 
+      )
+    )
+)
 }
 
 #' Add external Resources to the Application
