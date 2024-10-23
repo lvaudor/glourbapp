@@ -27,10 +27,6 @@ mod_help_ui <- function(id) {
 mod_help_server <- function(id, r_val){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
-
-
-
-    # Set up a dynamic observer based on the active tab
     observeEvent(input$help_btn, {
       print("pouetpouet")
 
@@ -45,7 +41,6 @@ mod_help_server <- function(id, r_val){
         prev_btn_text = "Précédent",
       )
 
-      # browser()
 
       #| notes:
       #| <p> for paragraph, <br/> for line break

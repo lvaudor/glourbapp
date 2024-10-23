@@ -32,7 +32,7 @@ app_ui <- function(request) {
 
   # Define the help button outside of navbarPage, but position it inside with CSS
       div(class = "help-btn",
-          mod_help_ui("help_1") # Use the cicerone UI module here
+          mod_help_ui("mod_help_1") # Use the cicerone UI module here
       ),
 
       navbarPage(
