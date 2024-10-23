@@ -26,14 +26,15 @@ mod_discourses_ui <- function(id){
                                     "Page localness based on",
                                     c("URL","language","URL_and_language")),
                         leaflet::leafletOutput(ns("global_localness_plot"))),
-               tabPanel("search word(s)",
-                        textInput(ns("searched_words"),
-                                  "Search this:",
+               tabPanel("search word",
+                        textInput(ns("searched_word"),
+                                  "Search this word:",
                                   value=""),
                         radioButtons(ns("searched_table"),
                                      "In table:",
                                      choices=c("txt_page","txt_segment"),
-                                     selected="txt_page"),
+                                     selected="txt_segment"),
+                        actionButton(ns("search_btn"), "Search"), # Bouton de recherche
                         DT::dataTableOutput(ns("searched_lines")))
                )
       ),
@@ -91,13 +92,22 @@ mod_discourses_server <- function(id,conn){
                                            thisRiver=input$river,
                                            conn=conn)
     })
-
-    output$searched_lines=renderDataTable({
-      var=switch(input$searched_table,
-                 txt_page="text_en",
-                 txt_segment="text")
-      query=glue::glue("SELECT * FROM {input$searched_table} WHERE {var} LIKE '{input$searched_words}';")
+    observeEvent(input$search_btn, {
+      output$searched_lines=renderDataTable({
+        print("inrenderDataTable")
+        var=switch(input$searched_table,
+                   txt_page="text_en",
+                   txt_segment="text")
+        print(var)
+        query=glue::glue("SELECT * FROM {input$searched_table} WHERE {var} LIKE '%{input$searched_word}%';")
+        print(query)
+        print(conn)
+        result=DBI::dbGetQuery(conn=conn,
+                               query)
+      })
     })
+
+
     output$ui_river=renderUI({
       print("in ui_river")
       rivers=r_get_txt_city_rivers() %>%
@@ -116,6 +126,7 @@ mod_discourses_server <- function(id,conn){
         # arrange by decreasing order
         dplyr::arrange(desc(n)) %>%
         dplyr::ungroup()
+
 
       result_word[1:30,] %>% # show first 30 words
         dplyr::mutate(word = forcats::fct_reorder(word, n)) %>%
