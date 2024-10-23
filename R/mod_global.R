@@ -1,4 +1,4 @@
-#' WP1 UI Function
+#' mod_global UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_WP1_ui <- function(id){
+mod_global_ui <- function(id){
   ns <- NS(id)
   tagList(
     golem_add_external_resources(),
@@ -28,7 +28,7 @@ mod_WP1_ui <- function(id){
                         condition = "input.select_var == 'cluster'",ns=ns,
                         numericInput(ns("nclust"),
                                      "cluster: nb of classes",
-                                     min=2,max=30, value=2)
+                                     min=2,max=30, value=5)
                       )
                     ),#wellPanel
                     plotOutput(ns("plot_palette"))
@@ -36,6 +36,7 @@ mod_WP1_ui <- function(id){
                     column(width=9,
                            leaflet::leafletOutput(ns("global_map")),
                            tabsetPanel(
+                             id="mod_global_menu",
                              tabPanel("city",
                                       fluidRow(
                                         column(width=6,
@@ -79,10 +80,10 @@ mod_WP1_ui <- function(id){
   )#tagList
 }
 
-#' WP1 Server Functions
+#' mod_global Server Functions
 #'
 #' @noRd
-mod_WP1_server <- function(id){
+mod_global_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     r_all_cities=reactive({
@@ -155,7 +156,7 @@ mod_WP1_server <- function(id){
     })
     output$download_btn <- downloadHandler(
       filename = function() {
-        "GloUrb_WP1_table.csv"
+        "GloUrb_global_table.csv"
       },
       content = function(file) {
         write.csv(r_all_cities(), file)
@@ -165,8 +166,3 @@ mod_WP1_server <- function(id){
   })
 }
 
-## To be copied in the UI
-# mod_WP1_ui("WP1_1")
-
-## To be copied in the server
-# mod_WP1_server("WP1_1")

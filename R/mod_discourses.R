@@ -1,4 +1,4 @@
-#' webtext UI Function
+#' discourses UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_webtext_ui <- function(id){
+mod_discourses_ui <- function(id){
   ns <- NS(id)
   selection1=glourbi::all_cities %>%
     dplyr::filter(selection1==TRUE) %>%
@@ -25,7 +25,16 @@ mod_webtext_ui <- function(id){
                         selectInput(ns("localness"),
                                     "Page localness based on",
                                     c("URL","language","URL_and_language")),
-                        leaflet::leafletOutput(ns("global_localness_plot")))
+                        leaflet::leafletOutput(ns("global_localness_plot"))),
+               tabPanel("search word(s)",
+                        textInput(ns("searched_words"),
+                                  "Search this:",
+                                  value=""),
+                        radioButtons(ns("searched_table"),
+                                     "In table:",
+                                     choices=c("txt_page","txt_segment"),
+                                     selected="txt_page"),
+                        DT::dataTableOutput(ns("searched_lines")))
                )
       ),
       tabPanel("by city",
@@ -59,10 +68,10 @@ mod_webtext_ui <- function(id){
   )
 }
 
-#' webtext Server Functions
+#' mod_discourses Server Functions
 #'
 #' @noRd
-mod_webtext_server <- function(id,conn){
+mod_discourses_server <- function(id,conn){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
@@ -81,6 +90,13 @@ mod_webtext_server <- function(id,conn){
       tib_segment=glourbi::get_txt_segment(thisCityCode=glourbi::to_citycode(input$city),
                                            thisRiver=input$river,
                                            conn=conn)
+    })
+
+    output$searched_lines=renderDataTable({
+      var=switch(input$searched_table,
+                 txt_page="text_en",
+                 txt_segment="text")
+      query=glue::glue("SELECT * FROM {input$searched_table} WHERE {var} LIKE '{input$searched_words}';")
     })
     output$ui_river=renderUI({
       print("in ui_river")
@@ -300,9 +316,3 @@ mod_webtext_server <- function(id,conn){
   })
   }
 )}
-
-## To be copied in the UI
-# mod_webtext_ui("webtext_1")
-
-## To be copied in the server
-# mod_webtext_server("webtext_1")

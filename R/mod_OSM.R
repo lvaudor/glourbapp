@@ -1,4 +1,4 @@
-#' mod_WP3 UI Function
+#' mod_OSM UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_WP3_ui <- function(id){
+mod_OSM_ui <- function(id){
   ns <- NS(id)
   tagList(
     fluidRow(
@@ -33,10 +33,10 @@ mod_WP3_ui <- function(id){
   )
 }
 
-#' mod_WP3 Server Functions
+#' mod_OSM Server Functions
 #'
 #' @noRd
-mod_WP3_server <- function(id, conn){
+mod_OSM_server <- function(id, conn){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
@@ -174,8 +174,3 @@ mod_WP3_server <- function(id, conn){
   })
 }
 
-## To be copied in the UI
-# mod_WP3_ui("WP3_1")
-
-## To be copied in the server
-# mod_WP3_server("WP3_1")

@@ -1,4 +1,4 @@
-#' mod_WP3 UI Function
+#' mod_WDWP UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -24,7 +24,7 @@ mod_WDWP_ui <- function(id){
 )
 }
 
-#' mod_WP3 Server Functions
+#' mod_WDWP Server Functions
 #'
 #' @noRd
 mod_WDWP_server <- function(id){
@@ -63,9 +63,3 @@ mod_WDWP_server <- function(id){
 
   })
 }
-
-## To be copied in the UI
-# mod_WDWP_ui("WDWP_1")
-
-## To be copied in the server
-# mod_WDWP_server("WDWP_1")

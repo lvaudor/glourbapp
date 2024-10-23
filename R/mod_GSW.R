@@ -1,4 +1,4 @@
-#' percity UI Function
+#' mod_GSW UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_percity_ui <- function(id){
+mod_GSW_ui <- function(id){
   ns <- NS(id)
 
   selection1=glourbi::all_cities %>%
@@ -40,10 +40,10 @@ mod_percity_ui <- function(id){
   )
 }
 
-#' percity Server Functions
+#' mod_GSW Server Functions
 #'
 #' @noRd
-mod_percity_server <- function(id,conn){
+mod_GSW_server <- function(id,conn){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
@@ -155,9 +155,3 @@ mod_percity_server <- function(id,conn){
 
   })
 }
-
-## To be copied in the UI
-# mod_percity_ui("percity_1")
-
-## To be copied in the server
-# mod_percity_server("percity_1")

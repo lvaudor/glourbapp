@@ -18,12 +18,12 @@ app_server <- function(input, output, session) {
   )
 
   # Your application server logic
-  mod_WP1_server("WP1_1")
-  mod_WP3_server("WP3_1", conn)
-  mod_webtext_server("webtext_1",conn)
-  mod_percity_server("percity_1",conn)
-  mod_WDWP_server("WDWP_1")
-  mod_help_server("help_1",r_val)
+  mod_global_server("mod_global_1")
+  mod_OSM_server("mod_OSM_1", conn)
+  mod_discourses_server("mod_discourses_1",conn)
+  mod_GSW_server("mod_GSW_1",conn)
+  mod_WDWP_server("mod_WDWP_1")
+  mod_help_server("mod_help_1",r_val)
 
   # navbarPage identifier
   observeEvent(input$main_menu_tab, {
