@@ -35,8 +35,9 @@ mod_global_ui <- function(id){
                     ),#column
                     column(width=9,
                            leaflet::leafletOutput(ns("global_map")),
-                           tabsetPanel(
+                           div(
                              id="mod_global_menu",
+                           tabsetPanel(
                              tabPanel("city",
                                       fluidRow(
                                         column(width=6,
@@ -75,6 +76,7 @@ mod_global_ui <- function(id){
                                       textOutput(ns("test"))
                              )#tabPanel
                            )#tabsetPanel
+                           )#div
                     )#column
     )#fluidRow
   )#tagList

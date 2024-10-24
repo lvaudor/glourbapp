@@ -27,9 +27,11 @@ mod_help_ui <- function(id) {
 mod_help_server <- function(id, r_val){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
-    observeEvent(input$help_btn, {
-      print("pouetpouet")
 
+
+
+    # Set up a dynamic observer based on the active tab
+    observeEvent(input$help_btn, {
       # Reset tour steps for each new tab
       # tour$reset()
 
@@ -41,6 +43,7 @@ mod_help_server <- function(id, r_val){
         prev_btn_text = "Précédent",
       )
 
+      # browser()
 
       #| notes:
       #| <p> for paragraph, <br/> for line break
@@ -56,31 +59,35 @@ mod_help_server <- function(id, r_val){
       tour$step("main_menu_tab",
                 "Main menu",
                 description="
-                <p><b>Global:</b> Explore the general characteristics of the GloUrb study sites.</p>
+                <p><b>Global:</b> </p>
                 <p><b>Surface Water:</b> Explore and describe the changes in Surface Water for each study site.</p>
                 <p><b>Discourses:</b> Visualize the main topics surrounding all associations of city and river names (assessed using web-scraped textual contents).</p>
                 <p><b>OpenStreetMap:</b> Explore and analyse landuse and equipments related to the association of city and river (assessed using OpenStreetMap data).</p>",
                 position="bottom")
 
       if (r_val$main_menu_tab == "Global") {
+        tour$step("main_menu_tab",
+                  "Global",
+                  description="Explore the general characteristics of the GloUrb study sites.",
+                  position="bottom")
 
-          tour$step("mod_global_1-global_map", "Global map",
-                    description = "This global map displays the general characteristics of GloUrb study sites.",
-                    position = "right")
+        tour$step("mod_global_1-global_map", "Global map",
+                  description = "This global map displays the general characteristics of GloUrb study sites.",
+                  position = "right")
 
-          tour$step("mod_global_1-selection", "Study sites selection",
+        tour$step("mod_global_1-selection", "Study sites selection",
                   description = "You can display all originally considered cities or only those in sub-selections (selection1 for now).",
                   position = "right")
-          tour$step("mod_global_1-select_var", "Variable displayed on map",
-                    description = "The variable displayed on the map (through color) can be either a class obtained through a clustering of all available descriptors -in which case you can choose the number of study sites clusters-, or any of the general characteristics used for the clustering.",
-                    position = "right")
-          tour$step("mod_global_1-mod_global_menu", "Data description",
-                    description = "<p><b>city</b> The description of one city (selected through a click on the map)</p>
+        tour$step("mod_global_1-select_var", "Variable displayed on map",
+                  description = "The variable displayed on the map (through color) can be either a class obtained through a clustering of all available descriptors -in which case you can choose the number of study sites clusters-, or any of the general characteristics used for the clustering.",
+                  position = "right")
+        tour$step("mod_global_1-mod_global_menu", "Data description",
+                  description = "<p><b>city</b> The description of one city (selected through a click on the map)</p>
                                    <p><b>univar</b> The univariate distribution of the descriptors across clusters of city</p>
                                    <p><b>multivar</b> The multivariate description of cities across all quantitative descriptors (assessed through a PCA)</p>
                                    <p><b>allvar</b> The univariate description of cities across all descriptors </p>
                                    <p><b>data</b> The table of descriptors (can be downloaded).",
-                    position = "right")
+                  position = "right")
 
       }
       if (r_val$main_menu_tab == "Surface Water") {
@@ -97,7 +104,7 @@ mod_help_server <- function(id, r_val){
         tour$step("mod_GSW_1-GSWdescription", "Surface water change intensity.",
                   description = "Number of pixels with positive (green), no change (grey), and negative change (red) in surface water, per longitudinal and lateral zone.",
                   position = "right")
-        }
+      }
 
 
       tour$init()$start() # Start the tour
