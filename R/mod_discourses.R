@@ -14,28 +14,45 @@ mod_discourses_ui <- function(id){
     dplyr::arrange(Urban.Aggl) %>%
     dplyr::pull(Urban.Aggl)
   tagList(
+    div(id=ns("main_menu_help"),
     tabsetPanel(
       tabPanel("global",
                tabsetPanel(
                  tabPanel("topics map",
+                          HTML("<p>This map displays the <b>most specific topic for each city</b> (whichever river is considered) according to the results of the Search Engine Research Pages.</p>
+                                <p>The topics are <b>built automatically based on the contents of scraped pages</b>, through the clustering of text segments into classes, which are displayed in tab <b>topics tree</b>."),
                           leaflet::leafletOutput(ns("topics_map"))),
                  tabPanel("topics tree",
                           tags$img(src = "www/clusters_all_14_en.png", height = "700px", width = "1400px")),
                  tabPanel("localness",
-                          selectInput(ns("localness"),
-                                      "Page localness based on",
-                                      c("URL","language","URL_and_language")),
-                          leaflet::leafletOutput(ns("global_localness_plot"))),
+                          fluidRow(
+                            column(width=3,
+                                   HTML("<p>An <b>index of localness</b> for each scraped page is calculated based on the url's domain and page's language</p>
+                                         <p> The following map shows, for each city, the proportion of web pages assessed as local.</p>"),
+                                   selectInput(ns("localness"),
+                                               "Page localness based on",
+                                               c("URL","language","URL_and_language"))
+                                  ),
+                            column(width=9,
+                                   leaflet::leafletOutput(ns("global_localness_plot")))
+                          )#fluidRow
+                          ),
                  tabPanel("search word",
-                          textInput(ns("searched_word"),
+                          fluidRow(
+                            column(width=3,
+                                   textInput(ns("searched_word"),
                                     "Search this word:",
                                     value=""),
-                          radioButtons(ns("searched_table"),
+                                   radioButtons(ns("searched_table"),
                                        "In table:",
-                                       choices=c("txt_word","txt_segment","txt_page"),
+                                       choices=c("txt_segment","txt_page"),
                                        selected="txt_segment"),
-                          actionButton(ns("search_btn"), "Search"), # Bouton de recherche
-                          DT::dataTableOutput(ns("searched_lines")))
+                                    actionButton(ns("search_btn"), "Search")
+                                   ),
+                            column(width=9,
+                                   DT::dataTableOutput(ns("searched_lines")))
+                            ) #fluidRow
+                          )
                )
       ),
       tabPanel("by city",
@@ -66,6 +83,7 @@ mod_discourses_ui <- function(id){
                )
       )
     )#tabsetPanel
+    )#div
   )
 }
 

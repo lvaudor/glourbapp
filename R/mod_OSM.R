@@ -9,20 +9,27 @@
 #' @importFrom shiny NS tagList
 mod_OSM_ui <- function(id){
   ns <- NS(id)
+
+  selection1=glourbi::all_cities %>%
+    dplyr::filter(selection1==TRUE) %>%
+    dplyr::arrange(Urban.Aggl) %>%
+    dplyr::pull(Urban.Aggl)
   tagList(
     fluidRow(
       column(width=4,
+             div(id=ns("city_help"),
              selectInput(ns("city"),
                          "Choose city",
-                         choices=glourbi::all_cities %>%
-                           dplyr::filter(selection1==TRUE) %>%
-                           dplyr::pull(Urban.Aggl) %>% sort()),
+                         choices=selection1,
+                         selected=selection1[2])
+             ),#div
              checkboxInput(ns("wikidata"),
                            "Show Wikidata",
                            value=TRUE),
              checkboxGroupInput(ns("group"),
                          "OSM: Choose type",
-                         choices=unique(glourbapp::map_elems_global$group)),
+                         choices=unique(glourbapp::map_elems_global$group),
+                         selected="engineering"),
              plotOutput(ns("plot_osmglobal"))
              ),#column
       column(width=8,
@@ -50,7 +57,6 @@ mod_OSM_server <- function(id, conn){
       }
     )
     get_wdinfo=reactive({
-      print("pouet")
       wd=DBI::dbReadTable(conn=conn,
                           name="wikidata_table") %>%
         tibble::as_tibble()

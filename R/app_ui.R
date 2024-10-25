@@ -34,43 +34,31 @@ app_ui <- function(request) {
       div(class = "help-btn",
           mod_help_ui("mod_help_1") # Use the cicerone UI module here
       ),
-
       navbarPage(
-        id="main_menu_tab",
-      title=
-        img(
-          src = "www/GloUrb_wide.png",
-          height = 35,
-          width = 100
-        ),
-      tabPanel("Global",
-               icon = icon("globe"),
-               mod_global_ui("mod_global_1")),
-      tabPanel("Surface Water",
-               icon = icon("droplet"),
-               mod_GSW_ui("mod_GSW_1")),
-      tabPanel("Discourses",
-               icon=icon("comment"),
-               mod_discourses_ui("mod_discourses_1")),
-      tabPanel("OpenStreetMap",
-               icon=icon("map"),
-               mod_OSM_ui("mod_OSM_1")),
-      # tabPanel("WikiMedia",
-      #          mod_WDWP_ui("mod_WDWP_1")),
-      tabPanel("Doc",
-               icon=icon("circle-info"),
-               HTML(paste0("<p> To consult the documentation associated to this app",
-                           "please check <a href='https://lvaudor.github.io/glourbdoc/' ",
-                           "target='_blank'>",
-                           "this site</a>."))),
-      theme = bslib::bs_theme(version = 5, bootswatch = "united",
-      primary = "#308F10",
-      #secondary="#009CDE"
-      #primary = "#000000",
-      secondary="#909090"
+          id="main_menu_tab",
+          title=
+            img(
+              src = "www/GloUrb_wide.png",
+              height = 35,
+              width = 100
+            ),
+          tabPanel("Global",icon = icon("globe"),mod_global_ui("mod_global_1")),
+          tabPanel("Surface Water",icon = icon("droplet"),mod_GSW_ui("mod_GSW_1")),
+          tabPanel("Discourses",icon=icon("comment"),mod_discourses_ui("mod_discourses_1")),
+          tabPanel("OpenStreetMap",icon=icon("map"),mod_OSM_ui("mod_OSM_1")),
+          tabPanel("Doc",icon=icon("circle-info"),
+                   HTML(paste0("<p> To consult the documentation associated to this app",
+                               "please check <a href='https://lvaudor.github.io/glourbdoc/' ",
+                               "target='_blank'>",
+                               "this site</a>."))),
+          theme = bslib::bs_theme(version = 5, bootswatch = "united",
+          primary = "#308F10",
+          #secondary="#009CDE"
+          #primary = "#000000",
+          secondary="#909090"
 
-      )
-    )
+          )
+        )#navbarPage
 )
 }
 

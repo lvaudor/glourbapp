@@ -15,11 +15,12 @@ mod_GSW_ui <- function(id){
     dplyr::arrange(Urban.Aggl) %>%
     dplyr::pull(Urban.Aggl)
   tagList(
-
+    div(id="city_help",
     selectInput(ns("city"),
                 "Choose city",
                 choices=selection1,
-                selected=selection1[1]),
+                selected=selection1[2])
+    ),#div
     fluidRow(
       column(width=6,
              #checkboxInput("onlyGSW","only cities with GSW density"),
@@ -77,7 +78,7 @@ mod_GSW_server <- function(id,conn){
                       ggplot2::aes(x=sizepatch, y=ntype,fill=type, alpha=abs(mutype)/100))+
         ggplot2::geom_bar(stat="identity")+
         ggplot2::facet_grid(rows=ggplot2::vars(reach),cols=ggplot2::vars(zone))+
-        ggplot2::scale_fill_manual(values=c("red","black","green"))+
+        ggplot2::scale_fill_manual(values=c("#ff0000","#000000","#00ff00"))+
         ggplot2::theme(legend.position="none")
     })
 

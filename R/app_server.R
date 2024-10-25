@@ -11,10 +11,8 @@ app_server <- function(input, output, session) {
 
 
   r_val <- reactiveValues(
-
     # UI
     main_menu_tab=NULL # selected tab in main menu
-
   )
 
   # Your application server logic

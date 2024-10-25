@@ -52,60 +52,90 @@ mod_help_server <- function(id, r_val){
       #| <img src="www/logos_mapdo_evs_ofb.png" width="100px"> for images
       #| <code> for code snippets
       #|
-
-
       print(r_val$main_menu_tab)
-      ### Exploration-Tab tour ####
-      tour$step("main_menu_tab",
-                "Main menu",
-                description="
-                <p><b>Global:</b> </p>
-                <p><b>Surface Water:</b> Explore and describe the changes in Surface Water for each study site.</p>
-                <p><b>Discourses:</b> Visualize the main topics surrounding all associations of city and river names (assessed using web-scraped textual contents).</p>
-                <p><b>OpenStreetMap:</b> Explore and analyse landuse and equipments related to the association of city and river (assessed using OpenStreetMap data).</p>",
-                position="bottom")
-
       if (r_val$main_menu_tab == "Global") {
         tour$step("main_menu_tab",
                   "Global",
-                  description="Explore the general characteristics of the GloUrb study sites.",
+                  description="Explore the general characteristics of the GloUrb study sites.
+                  <p><small>Exit and choose another tab before pressing help if you want information about the other tabs.</small></p>",
                   position="bottom")
-
-        tour$step("mod_global_1-global_map", "Global map",
-                  description = "This global map displays the general characteristics of GloUrb study sites.",
-                  position = "right")
 
         tour$step("mod_global_1-selection", "Study sites selection",
                   description = "You can display all originally considered cities or only those in sub-selections (selection1 for now).",
                   position = "right")
-        tour$step("mod_global_1-select_var", "Variable displayed on map",
-                  description = "The variable displayed on the map (through color) can be either a class obtained through a clustering of all available descriptors -in which case you can choose the number of study sites clusters-, or any of the general characteristics used for the clustering.",
-                  position = "right")
-        tour$step("mod_global_1-mod_global_menu", "Data description",
-                  description = "<p><b>city</b> The description of one city (selected through a click on the map)</p>
-                                   <p><b>univar</b> The univariate distribution of the descriptors across clusters of city</p>
-                                   <p><b>multivar</b> The multivariate description of cities across all quantitative descriptors (assessed through a PCA)</p>
-                                   <p><b>allvar</b> The univariate description of cities across all descriptors </p>
-                                   <p><b>data</b> The table of descriptors (can be downloaded).",
-                  position = "right")
 
+
+        tour$step("mod_global_1-global_map", "Global map",
+                  description = "This global map displays <b>GloUrb study sites</b>. You can: <ul>
+                  <li>click on each circle to display popup information, and</li>
+                  <li> choose the descriptor displayed as color.</li></ul>",
+                  position = "left")
+
+        tour$step("mod_global_1-select_var_help", "Main descriptor",
+                  description = "<p>Choose the <b>main descriptor</b> according to which you want to display cities in the map and plots.</p>
+                                 <p>By default the descriptor is <b>cluster</b> i.e. a class obtained through a clustering of all available descriptors. You can choose interactively the number of clusters you wish to consider.</p>
+                                 <p>You can also display any other available <b>quantitative or categorical descriptor of cities</b></p>",
+                  position = "right")
+        tour$step("mod_global_1-plot_palette","Palette",
+                  description="The palette of colors according to which the main descriptor is displayed.")
+
+        tour$step("mod_global_1-mod_global_menu_help","Analysis of city descriptors",
+                  description=HTML("This menu allows you to display
+                                   <ul><li><b>city flash card</b>: the characteristics of <b>one city</b></li>
+                                   <li><b>cities univar</b> the distribution of <b>one descriptor</b> (the one selected for the global map visualization) across <b>all cities</b></li>
+                                   <li><b>cities multivar</b> the <b>multivariate</b> description of data across <b>all cities</b></li>
+                                   <li><b>cities omnivar</b> the univariate description of <b>all descriptors</b> across <b>all cities</b></li>."))
       }
       if (r_val$main_menu_tab == "Surface Water") {
+        tour$step("main_menu_tab",
+                  "Surface Water",
+                  description=HTML("Visualize the <b>extent and type of changes in surface water</b>.
+                  <p><small>Exit and choose another tab before pressing help if you want information about the other tabs.</small></p>"),
+                  position="bottom")
 
-        tour$step("mod_GSW_1-city", "Choose city",
-                  description = "This module shows results for all study sites in #selection 1",
+        tour$step("mod_GSW_1-city_help", "Choose city",
+                  description = HTML("<p>Results in this module are available for <b>all cities in #selection1</b>.</p>
+                  <p><small> Delete and start typing to select a particular city without scrolling through them all.</small></p>."),
                   position = "right")
 
         tour$step("mod_GSW_1-map_city", "Map",
-                  description = "<p>This map displays the study sites and its particular sub-areas defined through <b>longitudinal (upstream-urban-downstream)</b>
-                                 and <b>lateral (corridor-plain)</b> zonation.</p>
-                                 <p>The colors of layer GSW change correspond to the <b>intensity of change in surface water over the years 2000-2020 compared to years 1980-2000</b>.</p>",
+                  description = HTML("<p>This map displays the study sites and their sub-areas defined through <ul>
+                                      <li><b>longitudinal delineation</b>(upstream-urban-downstream)</li>
+                                      <li><b>lateral zonation</b> (corridor-plain).</li></ul></p>
+                                     <p>The colors of layer GSW change correspond to the <b>intensity of change in surface water</b> over the years <b>2000-2020</b> compared to years <b>1980-2000</b>.</p>"),
                   position = "right")
+
         tour$step("mod_GSW_1-GSWdescription", "Surface water change intensity.",
-                  description = "Number of pixels with positive (green), no change (grey), and negative change (red) in surface water, per longitudinal and lateral zone.",
+                  description = HTML("Number of pixels with <ul>
+                                     <li><b><span style='color: #00ff00'>positive</span></b> change in surface water</li>
+                                     <li><b>no change</b> in surface water, and</li>
+                                     <li><b><span style='color: #ff0000'>negative</span></b> change in surface water</li></ul>
+                                     per longitudinal and lateral zone."),
                   position = "right")
       }
+      if (r_val$main_menu_tab == "Discourses") {
+        tour$step("main_menu_tab",
+                  "Discourses",
+                  description="Visualize the <b>main topics</b> surrounding all <b>associations of city and river names</b> (assessed using web-scraped textual contents).
+                  <p><small>Exit and choose another tab before pressing help if you want information about the other tabs.</small></p>",
+                  position="bottom")
+        tour$step("mod_discourses_1-main_menu_help",
+                  "Global/city",
+                  description="Discourses results can be analysed <b>globally</b> or <b>city by city</b>",
+                  position="top")
+      }
+      if (r_val$main_menu_tab == "OpenStreetMap") {
+        tour$step("main_menu_tab",
+                  "OpenStreetMap",
+                  description="Explore and analyse landuse and equipments related to the association of city and river (assessed using OpenStreetMap data).
+                  <p><small>Exit and choose another tab before pressing help if you want information about the other tabs.</small></p>",
+                  position="bottom")
+        tour$step("mod_OSM_1-city_help", "Choose city",
+                  description = HTML("<p>Results in this module are available for <b>all cities in #selection1</b>.</p>
+                  <p><small> Delete and start typing to select a particular city without scrolling through them all.</small></p>."),
+                  position = "right")
 
+      }
 
       tour$init()$start() # Start the tour
     })

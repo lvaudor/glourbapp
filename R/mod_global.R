@@ -12,13 +12,15 @@ mod_global_ui <- function(id){
   tagList(
     golem_add_external_resources(),
     fluidRow(column(width=3,
-                    radioButtons(ns("selection"),
-                                 "Show cities in selection",
-                                 c("Selection 0 (993)","Selection 1 (298)"),
-                                 selected="Selection 0 (993)"),
+
                     wellPanel(
+                      radioButtons(ns("selection"),
+                                   "Show cities in selection",
+                                   c("Selection 0 (993)","Selection 1 (298)"),
+                                   selected="Selection 0 (993)"),
+                      div(id=ns("select_var_help"),
                       selectInput(ns("select_var"),
-                                  label="choose variable)",
+                                  label="Choose variable to display as color on map and plots",
                                   selected="cluster",
                                   choices=c("cluster",
                                             c(glourbi::sep_vars(glourbi::all_cities)$vars_cat,
@@ -30,31 +32,36 @@ mod_global_ui <- function(id){
                                      "cluster: nb of classes",
                                      min=2,max=30, value=5)
                       )
+                      ),
+                      plotOutput(ns("plot_palette"))
                     ),#wellPanel
-                    plotOutput(ns("plot_palette"))
                     ),#column
                     column(width=9,
                            leaflet::leafletOutput(ns("global_map")),
-                           div(
-                             id="mod_global_menu",
+                           div(id=ns("mod_global_menu_help"),
                            tabsetPanel(
-                             tabPanel("city",
+                             tabPanel("city flash card",
                                       fluidRow(
                                         column(width=6,
-                                               "Choose a city by clicking on the map",
-                                               uiOutput(ns("city_name"))
+                                               uiOutput(ns("city_name")),
+                                               HTML("<p>The description of <b>one city</b> across all descriptors.</p>
+                                                     <p>For <b>quantitative descriptors</b>, the position of the dot along the line corresponds to the <b>rank</b> of the considered city among all cities (on the left: lowest rank, on the right, highest rank).</p>
+                                                     <p>For <b>categorical descriptors</b>, labels and colors indicate the value of the variable for the considered city.</p>
+                                                     <p><b>Choose a city by clicking on the map.</b></p>")
                                                ),#column
                                         column(width=6,
                                                plotOutput(ns("plot_city")))#column
                                       )#fluidRow
 
                              ),#tabPanel
-                             tabPanel("univar",
+                             tabPanel("cities univar",
+                                      HTML("The <b>distribution of the selected variable</b>, possibly differentiated according to clusters of cities."),
                                       checkboxInput(ns("distrib_by_class"),
-                                                    "display univar distribution by cluster"),
+                                                    "Differentiate clusters of cities"),
                                       plotOutput(ns("plot_distrib"))
                              ),#tabPanel
-                             tabPanel("multivar",
+                             tabPanel("cities multivar",
+                                      HTML("The <b>multivariate description of cities across all quantitative descriptors</b> (assessed through a principal component analysis)"),
                                       fluidRow(
                                         column(width=6,
                                                plotly::plotlyOutput(ns("varpcaplot"))),
@@ -62,9 +69,11 @@ mod_global_ui <- function(id){
                                                plotly::plotlyOutput(ns("indpcaplot")))
                                       )#fluidRow
                              ),#tabPanel
-                             tabPanel("boxplots",
+                             tabPanel("cities omnivar",
+                                      HTML("<p>The distribution of <b>all descriptors</b> across cities: boxplots for quantitative descriptors, barplots for categorical descriptors.</p>
+                                           <p> The displayed values for quantitative descriptors can be either their ranks (by default), or their raw values.<p>"),
                                       checkboxInput(ns("display_ranks"),
-                                                    label="display ranks",
+                                                    label="Display ranks",
                                                     value=TRUE),
                                       plotOutput(ns("description_clusters"))
                              ),#tabPanel
@@ -72,9 +81,9 @@ mod_global_ui <- function(id){
                                       downloadButton(ns("download_btn"), "Download this data"),
                                       DT::dataTableOutput(ns("tableclust"))
                              ),#tabPanel
-                             tabPanel("test",
-                                      textOutput(ns("test"))
-                             )#tabPanel
+                             # tabPanel("test",
+                             #          textOutput(ns("test"))
+                             # )#tabPanel
                            )#tabsetPanel
                            )#div
                     )#column
@@ -126,7 +135,6 @@ mod_global_server <- function(id){
     output$indpcaplot=plotly::renderPlotly({
       highlight_subset=r_all_cities() %>%
         dplyr::filter(name==r_get_city())
-      print(highlight_subset)
       glourbi::plot_pca(dataset=r_all_cities(),
                         r_calc_pca(),
                         type="ind",
@@ -164,7 +172,6 @@ mod_global_server <- function(id){
         write.csv(r_all_cities(), file)
       }
     )
-
   })
 }
 
