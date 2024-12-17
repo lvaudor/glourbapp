@@ -4,4 +4,4 @@ This package is a shiny app developped for the **GloUrb** project (ANR-22-CE03-0
 
 You can use the app [here](https://analytics.huma-num.fr/Lise.Vaudor/glourbapp/).
 
-For more information about the app please consult [this website](https://lvaudor.github.io/glourbdoc/)
+For more information about the app please consult [this website](https://evs-gis.github.io/glourbdoc/)
